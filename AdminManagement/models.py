@@ -61,7 +61,7 @@ class Zona(models.Model):
     parqueid = models.ForeignKey(Parque, models.CASCADE, db_column='ParqueID')  # Field name made lowercase.
     numero_da_zona = models.IntegerField(db_column='Numero da zona', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     lugares = models.IntegerField(db_column='Lugares')  # Field name made lowercase.
-    tipo_de_zona = models.CharField(db_column='Estado', max_length=255, blank=True, null=True)
+    tipo_de_zona = models.CharField(db_column='Tipo de Zona', max_length=255, blank=True, null=True)
 
     def get_absolute_url(self):
         return f"/parque/{self.parqueid.id}/zona/{self.id}/"

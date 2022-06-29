@@ -3,7 +3,7 @@ from django_tables2.utils import A
 from .models import Parque, Zona, Lugar
 
 class ParqueTable(tables.Table):
-    Ver_Mais = tables.LinkColumn('parque:parque-detail', text='Ver Mais', args=[A('id')])
+    Ver_Mais = tables.LinkColumn('AdminManagement:parque-detail', text='Ver Mais', args=[A('id')])
     class Meta:
         model = Parque
         fields = ("nome", "capacidade", "zonas", "estado", "morada", "cidade", "codigo_postal" )
