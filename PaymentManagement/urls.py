@@ -17,7 +17,9 @@ urlpatterns = [
     #GESTAO DE FATURACAO
     path('reserva/<int:id>/pagar/', views.reserva_payment_create_view, name="reserva-pay"), #efetuar pagamento reserva
     path('registo/<int:id>/pagar/', views.registo_payment_create_view, name="registo-pay"), #efetuar pagamento registo
-    path('contrato/<int:id>/pagar', views.payment_create_view, name="contrato-pay"), #dados de pagamento para contrato
+    path('contrato/<int:id>/pagar/<int:payid>/', views.PaymentOptionsView.as_view(), name="contrato-pay-options"), #dados de pagamento para contrato
+    path('contrato/<int:id>/pagar/<int:payid>/cartao', views.payment_create_view, name="contrato-pay-card"), #dados de pagamento para contrato
+    path('contrato/<int:id>/pagar/<int:payid>/referencia', views.payment_create_view_reference, name="contrato-pay-reference"), #dados de pagamento para contrato
     path('fatura/', views.FaturaListView.as_view(), name="fatura"), #consultar faturas
     path('pagamento/<int:id>/emitir/', views.emit_fatura_view, name="fatura-emit"), #emitir fatura
     path('pagamento/', views.payment_view.as_view(), name="payment"), #consultar pagamentos

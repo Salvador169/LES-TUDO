@@ -1,4 +1,6 @@
 import datetime
+import random
+import string
 from django.urls import reverse
 import stripe
 from django.core.mail import send_mail
@@ -93,7 +95,8 @@ def contrato_create_view(request, id):
         if form.is_valid():
             form.save()
             contrato = Contrato.objects.latest("id")
-            return redirect(reverse('PaymentManagement:contrato-pay', kwargs={ 'id': contrato.id }))
+            pagamento = Pagamento.objects.get(contratoid=contrato.id)
+            return redirect(reverse('PaymentManagement:contrato-pay-options', kwargs={ 'id': contrato.id, 'payid': pagamento.id}))
     else:
         form = ContratoForm(current_user=Cliente.objects.get(id=1))
     context ={
@@ -207,11 +210,11 @@ def payment_prove_create_view(request, id):
     
     return render(request, "payment_prove.html")
 
-def payment_create_view(request, id):
+def payment_create_view(request, id, payid):
     if request.method=='POST':
         form = PaymentModelForm(request.POST)
         contrato = Contrato.objects.get(id = id)
-        payment = Pagamento.objects.get(contratoid=contrato)
+        payment = Pagamento.objects.get(id = payid)
         if form.is_valid():
             payment.estado_do_pagamento = "Pago"
             payment.save()
@@ -226,6 +229,21 @@ def payment_create_view(request, id):
         'price': price,
     }
     return render(request, "payment.html", context)
+
+def payment_create_view_reference(request, id, payid):
+    S = 9  # number of characters in the string.  
+    # call random.choices() string module to find the string in Uppercase + numeric data.  
+    randomNum = ''.join(random.choices(string.digits, k = S))    
+    reference = ' '.join([randomNum[i:i+3] for i in range(0, len(randomNum), 3)])
+    entidade = 11111
+    pagamento=Pagamento.objects.get(id = payid)
+    template = loader.get_template('reference.html')
+    context ={
+        'referencia': reference,
+        'entidade':entidade,
+        'montante':pagamento.montante,
+    }
+    return HttpResponse(template.render(context, request))
 
 def reserva_payment_create_view(request, id):
     reserva = Reserva.objects.get(id = id)
@@ -275,6 +293,9 @@ def registo_payment_create_view(request, id):
 
 class OptionsView(TemplateView):
     template_name = "options.html"
+
+class PaymentOptionsView(TemplateView):
+    template_name = "pay_options.html"
 
 
 def emit_fatura_view(request, id):

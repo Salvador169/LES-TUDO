@@ -84,6 +84,8 @@ class Pagamento(models.Model):
     estado_do_pagamento = models.TextField(db_column='Estado do pagamento')  # Field name made lowercase. Field renamed to remove unsuitable characters. This field type is a guess.
     data_de_vencimento = models.DateTimeField(auto_now=False, auto_now_add=False, db_column='Data de vencimento', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     comprovativo = models.FileField(blank=True, null=True)
+    numero_cartao = models.TextField(blank=True, null=True)
+    referencia = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'Pagamento'
@@ -208,8 +210,7 @@ class TabelaPrecos(models.Model):
         return days
 
     @staticmethod
-    def getPrice(contrato = None, reserva = None, registo = None, date = None, all=True):
-        
+    def getPrice(contrato = None, reserva = None, registo = None, all=True):
         if contrato:
             tabelaPrecos = TabelaPrecos.objects.get(parqueid = contrato.parqueid)
             periodicidade = contrato.periodicidadeid
