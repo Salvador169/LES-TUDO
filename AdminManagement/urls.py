@@ -1,10 +1,14 @@
 from django.urls import path
 from .views import (
+    ErrorErrorView,
+    ErrorView,
+    LugarErrorView,
     ParqueCreateView,
     ParqueListView,
     ParqueDetailView,
     ParqueUpdateView,
     ParqueDeleteView,
+    ZonaErrorView,
     ZonaListView,
     ZonaDeleteView,
     ZonaCreateView,
@@ -36,4 +40,9 @@ urlpatterns = [
     path('<int:id>/zona/<int:pk>/lugar/<int:lugar>/delete/', LugarDeleteView.as_view(), name='lugar-delete'),
     path('<int:id>/zona/<int:pk>/lugar/create/', LugarCreateView.as_view(), name='lugar-create'),
     path('<int:id>/zona/<int:pk>/lugar/<int:lugar>/update/', LugarUpdateView.as_view(), name='lugar-update'),
+
+    path('<int:id>/zona/create/erro/', ZonaErrorView.as_view()),
+    path('<int:id>/zona/<int:pk>/lugar/create/erro/', LugarErrorView.as_view()),
+    path('<int:id>/zona/create/erro/erro/', ErrorView.as_view()),
+    path('<int:id>/zona/<int:pk>/update/erro/', ErrorErrorView.as_view()),
 ]

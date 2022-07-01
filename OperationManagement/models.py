@@ -9,6 +9,7 @@ from datetime import datetime
 from django.db import models
 
 
+
 class RegistoMovimento(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     parqueid = models.ForeignKey('AdminManagement.Parque', models.CASCADE, db_column='ParqueID', default=1)  # Field name made lowercase.

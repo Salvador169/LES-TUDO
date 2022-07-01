@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-md-12">
 
-                       <a href="/sair_parque_form/{{ parque.id }}">
+                       <a href="{% url 'OperationManagement:sair_parque_form' parque_id=parque.id %}">
                            <button style="margin-top: 1em" class="btn btn-danger">Sair de {{ parque.nome }}</button>
                        </a>
 

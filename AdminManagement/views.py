@@ -1,11 +1,13 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django_tables2 import SingleTableView
+from django.db.models import Sum
 
 from django.views.generic import (
     DetailView,
     CreateView,
     UpdateView,
-    DeleteView
+    DeleteView,
+    TemplateView,
     )
 
 from .tables import ParqueTable, ZonaTable, LugarTable
@@ -16,6 +18,18 @@ from .tables import ParqueTable
 
 def index_view(request, *args, **kwargs):
     return render(request, "home.html", {})
+
+class ZonaErrorView(TemplateView):
+    template_name = "erro_zona.html"
+
+class LugarErrorView(TemplateView):
+    template_name = "erro_lugar.html"
+
+class ErrorView(TemplateView):
+    template_name = "erro_erro.html"
+
+class ErrorErrorView(TemplateView):
+    template_name = "err.html"
 
 #==================================================================================================
 #Parque
@@ -124,7 +138,27 @@ class ZonaCreateView(CreateView):
     def form_valid(self, form):
         zona = form.save(commit=False)
         zona.parqueid = Parque.objects.get(id=self.kwargs["id"])
+
+        capacidade_input = form.cleaned_data.get("lugares")
+        capacidade_existente = Zona.objects.filter(parqueid=zona.parqueid).aggregate(Sum('lugares'))
+
+        zonas_possiveis = Parque.objects.get(id=zona.parqueid.id)
+        zonas_existentes = Zona.objects.filter(parqueid=zona.parqueid).count()
+
+        if(zonas_possiveis.zonas <= zonas_existentes):
+            return redirect('erro/')
+
+        if(capacidade_existente['lugares__sum'] == None):
+            temp = 0
+        else:
+            temp = capacidade_existente['lugares__sum']
+
+        if(temp+capacidade_input > zona.parqueid.capacidade):
+            return redirect('erro/erro/')
+
+
         return super(ZonaCreateView, self).form_valid(form)
+            
 
     def get_success_url(self):
         return '../'
@@ -139,6 +173,22 @@ class ZonaUpdateView(UpdateView):
     def form_valid(self, form):
         zona = form.save(commit=False)
         zona.parqueid = Parque.objects.get(id=self.kwargs["id"])
+
+        capacidade_input = form.cleaned_data.get("lugares")
+        capacidade_existente = Zona.objects.filter(parqueid=zona.parqueid).aggregate(Sum('lugares'))
+        capacidade_existente_zona = Zona.objects.filter(id=zona.id).aggregate(Sum('lugares'))
+
+        print(capacidade_existente['lugares__sum'])
+        print(capacidade_existente_zona['lugares__sum'])
+
+        if(capacidade_existente['lugares__sum'] == None):
+            temp = 0
+        else:
+            temp = capacidade_existente['lugares__sum']
+
+        if(temp+capacidade_input-capacidade_existente_zona['lugares__sum'] > zona.parqueid.capacidade):
+            return redirect('erro/')
+
         return super(ZonaUpdateView, self).form_valid(form)
 
     def get_success_url(self):
@@ -203,7 +253,12 @@ class LugarCreateView(CreateView):
     def form_valid(self, form):
         lugar = form.save(commit=False)
         lugar.zonaid = Zona.objects.get(id=self.kwargs["pk"])
-        return super(LugarCreateView, self).form_valid(form)
+        lugares_possiveis = Zona.objects.get(id=lugar.zonaid.id)
+        lugares_existentes = Lugar.objects.filter(zonaid=lugar.zonaid).count()
+        if(lugares_possiveis.lugares > lugares_existentes):
+            return super(LugarCreateView, self).form_valid(form)
+        else:
+            return redirect('erro/')
 
     def get_success_url(self):
         return '../'

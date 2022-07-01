@@ -21,4 +21,5 @@ urlpatterns = [
     path('OperationManagement/', include('OperationManagement.urls')),
     path('AdminManagement/', include('AdminManagement.urls')),
     path('PaymentManagement/', include('PaymentManagement.urls')),
+    path('ReserveManagement/', include('ReserveManagement.urls')),
 ]

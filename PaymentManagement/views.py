@@ -13,8 +13,9 @@ from django.core.files.storage import FileSystemStorage
 
 from AdminManagement.models import Lugar, Parque
 from OperationManagement.models import RegistoMovimento
+from .models import Reserva, TabelaPrecos
 
-from .models import Cliente, Contrato, Dia, Fatura, Pagamento, Reclamacao, Reserva, TabelaPrecos
+from .models import Cliente, Contrato, Dia, Fatura, Pagamento, Reclamacao
 from .forms import ContratoForm, FaturaModelForm, PaymentModelForm, ReclamacaoModelForm
 from django.views.generic import (
     ListView, 

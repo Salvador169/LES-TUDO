@@ -6,7 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.urls import reverse
-import datetime, time
+from datetime import datetime
 from django.db import connection, models
 import numpy as np
 from dateutil.relativedelta import relativedelta
@@ -65,25 +65,15 @@ class Contrato(models.Model):
     class Meta:
         db_table = 'Contrato'
 
-class Reserva(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    parqueid = models.ForeignKey('AdminManagement.Parque', models.CASCADE, db_column='ParqueID', default=1)  # Field name made lowercase.
-    viaturaid = models.ForeignKey('OperationManagement.Viatura', models.CASCADE, db_column='ViaturaID', default=1)  # Field name made lowercase.
-    data_de_inicio = models.DateTimeField(auto_now=False, auto_now_add=False, db_column='Data de inicio', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    data_de_termino = models.DateTimeField(auto_now=False, auto_now_add=False, db_column='Data de termino', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-
-    class Meta:
-        db_table = 'Reserva'
-
 class Pagamento(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     contratoid = models.ForeignKey(Contrato, models.CASCADE, db_column='ContratoID', blank=True, null=True)  # Field name made lowercase.
-    reservaid = models.ForeignKey(Reserva, models.CASCADE, db_column='ReservaID', blank=True, null=True)  # Field name made lowercase.
+    reservaid = models.ForeignKey('Reserva', models.CASCADE, db_column='ReservaID', blank=True, null=True)  # Field name made lowercase.
     registoid = models.ForeignKey('OperationManagement.RegistoMovimento', models.CASCADE, db_column='RegistoID', blank=True, null=True)  # Field name made lowercase.
     montante = models.FloatField(db_column='Montante')  # Field name made lowercase.
     estado_do_pagamento = models.TextField(db_column='Estado do pagamento')  # Field name made lowercase. Field renamed to remove unsuitable characters. This field type is a guess.
     data_de_vencimento = models.DateTimeField(auto_now=False, auto_now_add=False, db_column='Data de vencimento', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    comprovativo = models.FileField(blank=True, null=True)
+    comprovativo = models.FileField(db_column='Comprovativo', blank=True, null=True)
     numero_cartao = models.TextField(blank=True, null=True)
     referencia = models.TextField(blank=True, null=True)
 
@@ -104,10 +94,50 @@ class Fatura(models.Model):
 class Reclamacao(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     faturaid = models.ForeignKey(Fatura, models.CASCADE, db_column='FaturaID', blank=True, null=True)  # Field name made lowercase.
+    registo_movimentoid = models.ForeignKey('OperationManagement.RegistoMovimento', models.CASCADE, db_column='Registo-movimentoID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     reclamacao = models.CharField(db_column='Reclamacao', max_length=255, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'Reclamacao'
+
+
+class Reserva(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    parqueid = models.ForeignKey('AdminManagement.Parque', models.CASCADE, db_column='ParqueID', default=1)  # Field name made lowercase.
+    viaturaid = models.ForeignKey('OperationManagement.Viatura', models.CASCADE, db_column='ViaturaID', default=1)  # Field name made lowercase.
+    data_de_inicio = models.DateField(auto_now=False, auto_now_add=False, db_column='Data de inicio', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    data_de_termino = models.DateField(auto_now=False, auto_now_add=False, db_column='Data de termino', blank=True, null=True)
+    hora_de_inicio = models.TimeField(db_column='Hora de inicio', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    hora_de_termino = models.TimeField(db_column='Hora de termino', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    
+    @staticmethod
+    def makeOptions():
+        if "main_reserva" in connection.introspection.table_names():
+            parques = 'AdminManagement.Parque'.objects.all()
+            options=([(parque.nome) for parque in parques])
+            return options
+        else:
+            return (("1", "No Database created"),)
+    
+    @staticmethod
+    def makeOptions1():
+        if "main_reserva" in connection.introspection.table_names():
+            lugar = 'AdminManagement.Lugar'.objects.all()
+            options=([(lugar.nome) for l in lugar])
+            return options
+        else:
+            return (("1", "No Database created"),)
+
+    def makeOptions2():
+        if "main_reserva" in connection.introspection.table_names():
+            viatura = 'OperationManagement.Viatura'.objects.all()
+            options=([(viatura.matricula) for v in viatura])
+            return options
+        else:
+            return (("1", "No Database created"),)
+    
+    class Meta:
+        db_table = 'Reserva'
 
 class TabelaPrecos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -121,6 +151,10 @@ class TabelaPrecos(models.Model):
     preco_contrato_diurno = models.FloatField(db_column='Preco Contrato Diurno')  # Field name made lowercase. Field renamed to remove unsuitable characters.
     preco_contrato_noturno = models.FloatField(db_column='Preco Contrato Noturno')  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
+
+    def get_absolute_url(self):
+        return reverse("parque:parque-detail", kwargs={"id": self.id})
+
     @staticmethod
     def getDaysContrato(contrato = None, all=True):
         periodicidade = contrato.periodicidadeid
@@ -129,31 +163,31 @@ class TabelaPrecos(models.Model):
                 days = contrato.data_de_termino - contrato.data_de_inicio
             else:
                 week = ""
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Segunda-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Segunda-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Terça-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Terça-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Quarta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Quarta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Quinta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Quinta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Sexta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Sexta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Sábado").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Sábado").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Domingo").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Domingo").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
@@ -167,31 +201,31 @@ class TabelaPrecos(models.Model):
                 days = days.days
             else:
                 week = ""
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Segunda-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Segunda-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Terça-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Terça-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Quarta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Quarta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Quinta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Quinta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Sexta-Feira").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Sexta-Feira").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Sábado").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Sábado").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"
-                if Dia.objects.filter(periodicidadeid=periodicidade, nome="Domingo").count() > 0:
+                if 'PaymentManagement.Dia'.objects.filter(periodicidadeid=periodicidade, nome="Domingo").count() > 0:
                     week = week + "1"
                 else:
                     week = week + "0"

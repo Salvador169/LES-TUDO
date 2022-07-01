@@ -11,11 +11,11 @@
 </head>
 <body>
 
-        <a class="btn btn-danger" href="/index/{{ parques.id }}" style="color: white; margin-right: 1em" type="submit">Voltar</a>
+        <a class="btn btn-danger" href="{% url 'OperationManagement:index' parque_id=parques.id %}" style="color: white; margin-right: 1em" type="submit">Voltar</a>
 
         <div class="container">
             {% for registo in registos %}
-                {{ registo.data_de_entrada }}  <a class="btn btn-primary" href="/fazer_reclamacao/{{ parques.id }}/{{ fatura.id }}" style="color: white; margin-right: 1em" type="submit">Fazer reclamação</a>
+                {{ registo.data_de_entrada }}  <a class="btn btn-primary" href="{% url 'OperationManagement:reclamar_fatura' parque_id=parques.id fatura_id=fatura.id %}" style="color: white; margin-right: 1em" type="submit">Fazer reclamação</a>
             {% endfor %}
         </div>
 

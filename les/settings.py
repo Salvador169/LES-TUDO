@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'AdminManagement',
     'PaymentManagement',
     'OperationManagement',
+    'ReserveManagement',
     'crispy_forms',
     'django_tables2',
     'clear_cache',

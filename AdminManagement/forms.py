@@ -28,6 +28,9 @@ class ParqueModelFormCreate(forms.ModelForm):
     codigo_postal = forms.IntegerField(
         required=True
         )
+    foto = forms.ImageField(
+        required=False
+    )
 
     class Meta:
         model = Parque
@@ -38,6 +41,7 @@ class ParqueModelFormCreate(forms.ModelForm):
             'morada',
             'cidade',
             'codigo_postal',
+            'foto'
         ]
 
     def clean_morada(self):
@@ -219,6 +223,9 @@ class ParqueModelForm(forms.ModelForm):
     codigo_postal = forms.IntegerField(
         required=True
         )
+    foto = forms.ImageField(
+        required=False
+    )
 
     class Meta:
         model = Parque
@@ -230,6 +237,7 @@ class ParqueModelForm(forms.ModelForm):
             'morada',
             'cidade',
             'codigo_postal',
+            'foto'
         ]
 
     def clean_morada(self):
@@ -387,13 +395,11 @@ class ZonaModelForm(forms.ModelForm):
         required=True,
         initial=1,
         min_value=1,
-        max_value=1000
         )
     lugares = forms.IntegerField(
         required=True,
         initial=1,
         min_value=1,
-        max_value=1000
         )
     tipo_de_zona = forms.ChoiceField(
         choices=Zona.make_options(),
@@ -407,6 +413,7 @@ class ZonaModelForm(forms.ModelForm):
             'lugares',
             'tipo_de_zona'
         ]
+            
 
 
 
@@ -415,7 +422,6 @@ class LugarModelForm(forms.ModelForm):
         required=True,
         initial=1,
         min_value=1,
-        max_value=1000
         )
     estado = forms.ChoiceField(
         choices=Lugar.make_options(),
@@ -434,7 +440,6 @@ class LugarModelFormCreate(forms.ModelForm):
         required=True,
         initial=1,
         min_value=1,
-        max_value=1000
         )
 
     class Meta:
@@ -442,18 +447,3 @@ class LugarModelFormCreate(forms.ModelForm):
         fields = [
             'numero_do_lugar',
         ]
-
-
-
-    # def clean_nome(self, *args, **kwargs):
-    #     nome=self.cleaned_data.get("nome")
-    #     if "@" in nome:
-    #         raise forms.ValidationError("This is not a valid title")
-    #     else:
-    #         return nome
-
-    #    def clean_email(self, *args, **kwargs):
-    #        email=self.cleaned_data.get("email")
-    #        if not email.endswith("edu"):
-    #            raise forms.ValidationError("This is not a valid email")
-    #        return email
