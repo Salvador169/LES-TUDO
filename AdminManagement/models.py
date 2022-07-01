@@ -20,7 +20,7 @@ class Parque(models.Model):
     foto = models.ImageField(upload_to='images/', db_column='Foto', blank=True, null=True)
 
     def get_absolute_url(self):
-        return f"/parque/{self.id}/"
+        return f"/AdminManagement/{self.id}/"
 
     @staticmethod
     def make_options():
@@ -65,7 +65,7 @@ class Zona(models.Model):
     tipo_de_zona = models.CharField(db_column='Tipo de zona', max_length=255, blank=True, null=True)
 
     def get_absolute_url(self):
-        return f"/parque/{self.parqueid.id}/zona/{self.id}/"
+        return f"/AdminManagement/{self.parqueid.id}/zona/{self.id}/"
 
     @staticmethod
     def make_options():
@@ -85,7 +85,7 @@ class Lugar(models.Model):
     estado = models.CharField(db_column='Estado', max_length=255, default="Disponivel")  # Field name made lowercase.
 
     def get_absolute_url(self):
-        return f"/parque/{1}/zona/{self.zonaid.id}/lugar/{self.id}"
+        return f"/AdminManagement/{1}/zona/{self.zonaid.id}/lugar/{self.id}"
 
     @staticmethod
     def make_options():

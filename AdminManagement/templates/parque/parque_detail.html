@@ -8,6 +8,9 @@
 <p>Morada: {{ object.morada }}</p>
 <p>Código Postal: {{ object.codigo_postal }}</p>
 <p>Cidade: {{ object.cidade }}</p>
+{% if object.foto.url != None %}
+<p>Foto: <img class="img-responsive" style="width: auto; height: auto" src="{{ object.foto.url }}"/></p>
+{% endif %}
 
 <hr>
 

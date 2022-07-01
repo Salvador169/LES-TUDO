@@ -91,7 +91,7 @@ class ParqueDeleteView(DeleteView):
         return get_object_or_404(Parque, id=id_)
 
     def get_success_url(self):
-        return '../../../'
+        return '../../'
 
 
 

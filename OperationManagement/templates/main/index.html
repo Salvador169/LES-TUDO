@@ -38,10 +38,10 @@
                                     Lugares:  {{ zona.lugares }}
                                     <br>
                                     <div class="container-fluid text-center">
-                                        <a class="btn btn-success" style="color: white;margin-bottom: 1em; margin-top: 1em" href="/associar_lugar/{{ parque.id }}/{{ zona.numero_da_zona }}">
+                                        <a class="btn btn-success" style="color: white;margin-bottom: 1em; margin-top: 1em" href="{% url 'OperationManagement:associar_lugar' parque_id=parque.id zona_id=zona.numero_da_zona %}">
                                             Associar lugar
                                         </a>
-                                        <a class="btn btn-danger" href="/desassociar_lugar/{{ parque.id }}/{{ zona.numero_da_zona }}">
+                                        <a class="btn btn-danger" href="{% url 'OperationManagement:desassociar_lugar' parque_id=parque.id zona_id=zona.numero_da_zona %}">
                                             Desassociar lugar
                                         </a>
                                     </div>
@@ -63,7 +63,7 @@
                                 <div class="h-100 border border-dark rounded p-4">
                                     {{ lugar.numero_do_lugar }}
                                     <p style="color: red">Ocupado</p>
-                                    <a href="/liberar_lugar/{{ parque.id }}/{{ lugar.numero_do_lugar }}">
+                                    <a href="{% url 'OperationManagement:liberar_lugar' parque_id=parque.id lugar_id=lugar.numero_do_lugar %}">
                                         Liberar lugar
                                     </a>
                                     <br>
@@ -77,7 +77,7 @@
                             <div class="h-100 border border-dark rounded p-4">
                                 {{ lugar.numero_do_lugar }}
                                 <p style="color: green">Livre</p>
-                                <a href="/ocupar_lugar/{{ parque.id }}/{{ lugar.numero_do_lugar }}">
+                                <a href="{% url 'OperationManagement:ocupar_lugar' parque_id=parque.id lugar_id=lugar.numero_do_lugar %}">
                                     Ocupar lugar
                                 </a>
                             </div>
@@ -90,13 +90,13 @@
         </div>
 
         {% for fatura in faturas %}
-        <a class="btn btn-primary" style="margin-top: 1em; margin-left: 1em; color: white" href="/consultar_entradas/{{ parque.id }}/{{ fatura.id }}">
+        <a class="btn btn-primary" style="margin-top: 1em; margin-left: 1em; color: white" href="{% url 'OperationManagement:reclamar_fatura' parque_id=parque.id fatura_id=fatura.id %}">
             Reclamar de {{ fatura.nomeEmpresa }}
         </a>
         {% endfor %}
 
         {% for reclamacao in reclamacoes %}
-         <a class="btn btn-primary" style="margin-top: 1em; margin-left: 1em; color: white" href="fatura/{{ fatura.id }}/reclamar/">
+         <a class="btn btn-primary" style="margin-top: 1em; margin-left: 1em; color: white" href="{% url 'OperationManagement:processar_reclamacao' parque_id=parque.id fatura_id=fatura.id %}">
                 Processar reclamação de {{ reclamacao.faturaid }}
          </a>
         {% endfor %}

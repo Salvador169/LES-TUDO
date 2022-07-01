@@ -29,7 +29,7 @@ class ParqueModelFormCreate(forms.ModelForm):
         required=True
         )
     foto = forms.ImageField(
-        required=False
+        required=True
     )
 
     class Meta:
@@ -224,7 +224,7 @@ class ParqueModelForm(forms.ModelForm):
         required=True
         )
     foto = forms.ImageField(
-        required=False
+        required=True
     )
 
     class Meta:

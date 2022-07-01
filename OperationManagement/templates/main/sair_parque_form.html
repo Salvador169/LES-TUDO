@@ -28,7 +28,7 @@
 
                          {{ form }}
                          <br>
-                         <a class="btn btn-danger" style="color: white; margin-right: 2em; margin-top: 2em" href="/index/{{ parques.id }}">Voltar</a>
+                         <a class="btn btn-danger" style="color: white; margin-right: 2em; margin-top: 2em" href="{% url 'OperationManagement:index' parque_id=parques.id %}">Voltar</a>
                          <button class="btn btn-primary" style="margin-top: 2em" type="submit">Sair</button>
                      </form>
 
